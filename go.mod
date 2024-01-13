@@ -6,6 +6,7 @@ toolchain go1.21.4
 
 require (
 	github.com/envoyproxy/protoc-gen-validate v1.0.3
+	github.com/georgysavva/scany v1.2.1
 	github.com/gojuno/minimock/v3 v3.3.6
 	github.com/golang/protobuf v1.5.3
 	github.com/grpc-ecosystem/grpc-gateway/v2 v2.19.0
@@ -25,6 +26,7 @@ require (
 	github.com/jackc/pgproto3/v2 v2.3.2 // indirect
 	github.com/jackc/pgservicefile v0.0.0-20221227161230-091c0ba34f0a // indirect
 	github.com/jackc/pgtype v1.14.0 // indirect
+	github.com/jackc/puddle v1.3.0 // indirect
 	github.com/pmezard/go-difflib v1.0.0 // indirect
 	golang.org/x/crypto v0.18.0 // indirect
 	golang.org/x/net v0.20.0 // indirect

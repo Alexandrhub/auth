@@ -7,12 +7,14 @@ import (
 	"github.com/joho/godotenv"
 )
 
+// Config структура конфигурации проекта
 type Config struct {
-	Grpc grpcConfig
-	Http httpConfig
-	Db   pgConfig
+	GRPC grpcConfig
+	HTTP httpConfig
+	DB   pgConfig
 }
 
+// MustConfig загружает конфигурацию из .env файла
 func MustConfig() Config {
 	err := godotenv.Load()
 	if err != nil {
@@ -20,15 +22,15 @@ func MustConfig() Config {
 	}
 
 	return Config{
-		Grpc: grpcConfig{
+		GRPC: grpcConfig{
 			Port: getEnv("GRPC_PORT", "50051"),
 			Host: getEnv("GRPC_HOST", "localhost"),
 		},
-		Http: httpConfig{
+		HTTP: httpConfig{
 			Port: getEnv("HTTP_PORT", "8080"),
 			Host: getEnv("HTTP_HOST", "localhost"),
 		},
-		Db: pgConfig{
+		DB: pgConfig{
 			Host:     getEnv("PG_HOST", "localhost"),
 			Port:     getEnv("PG_PORT", "5432"),
 			User:     getEnv("PG_USER", "postgres"),

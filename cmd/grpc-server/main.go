@@ -22,7 +22,7 @@ type server struct {
 func main() {
 	conf := config.MustConfig()
 
-	lis, err := net.Listen("tcp", fmt.Sprintf(":%s", conf.Grpc.Port))
+	lis, err := net.Listen("tcp", fmt.Sprintf(":%s", conf.GRPC.Port))
 	if err != nil {
 		log.Fatalf("failed to listen: %v", err)
 	}
