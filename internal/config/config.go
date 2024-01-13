@@ -1,6 +1,7 @@
 package config
 
 import (
+	"fmt"
 	"log"
 	"os"
 
@@ -9,9 +10,20 @@ import (
 
 // Config структура конфигурации проекта
 type Config struct {
-	GRPC grpcConfig
-	HTTP httpConfig
-	DB   pgConfig
+	GRPC GRPCConfig
+	HTTP HTTPConfig
+	DB   PgConfig
+}
+
+func (c Config) DSN() string {
+	return fmt.Sprintf(
+		"host=%s port=%s user=%s password=%s dbname=%s sslmode=disable",
+		c.DB.Host,
+		c.DB.Port,
+		c.DB.User,
+		c.DB.Password,
+		c.DB.Db,
+	)
 }
 
 // MustConfig загружает конфигурацию из .env файла
@@ -22,15 +34,15 @@ func MustConfig() Config {
 	}
 
 	return Config{
-		GRPC: grpcConfig{
+		GRPC: GRPCConfig{
 			Port: getEnv("GRPC_PORT", "50051"),
 			Host: getEnv("GRPC_HOST", "localhost"),
 		},
-		HTTP: httpConfig{
+		HTTP: HTTPConfig{
 			Port: getEnv("HTTP_PORT", "8080"),
 			Host: getEnv("HTTP_HOST", "localhost"),
 		},
-		DB: pgConfig{
+		DB: PgConfig{
 			Host:     getEnv("PG_HOST", "localhost"),
 			Port:     getEnv("PG_PORT", "5432"),
 			User:     getEnv("PG_USER", "postgres"),
