@@ -11,17 +11,18 @@ import (
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/reflection"
 
+	"github.com/alexandrhub/auth/internal/config"
 	pb "github.com/alexandrhub/auth/pkg/user_v1"
 )
-
-const grpcPort = 50051
 
 type server struct {
 	pb.UnimplementedUserV1Server
 }
 
 func main() {
-	lis, err := net.Listen("tcp", fmt.Sprintf(":%d", grpcPort))
+	conf := config.MustConfig()
+
+	lis, err := net.Listen("tcp", fmt.Sprintf(":%s", conf.Grpc.Port))
 	if err != nil {
 		log.Fatalf("failed to listen: %v", err)
 	}
