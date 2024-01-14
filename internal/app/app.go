@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"log"
 	"net"
+	"sync"
 
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
@@ -36,10 +37,18 @@ func (a *App) Run() error {
 		closer.Wait()
 	}()
 
-	err := a.runGRPCServer()
-	if err != nil {
-		log.Fatalf("failed to run grpc server: %v", err)
-	}
+	wg := sync.WaitGroup{}
+	wg.Add(1)
+	go func() {
+		defer wg.Done()
+
+		err := a.runGRPCServer()
+		if err != nil {
+			log.Fatalf("failed to run grpc server: %v", err)
+		}
+	}()
+
+	wg.Wait()
 
 	return nil
 }
@@ -71,7 +80,6 @@ func (a *App) initConfig(_ context.Context) error {
 }
 
 func (a *App) initServiceProvider(_ context.Context) error {
-
 	a.serviceProvider = newServiceProvider()
 	return nil
 }

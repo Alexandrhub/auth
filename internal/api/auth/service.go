@@ -2,11 +2,11 @@ package auth
 
 import (
 	"github.com/alexandrhub/auth/internal/service"
-	pb "github.com/alexandrhub/auth/pkg/user_v1"
+	desc "github.com/alexandrhub/auth/pkg/user_v1"
 )
 
 type Implementation struct {
-	pb.UnimplementedUserV1Server
+	desc.UnimplementedUserV1Server
 	authService service.AuthService
 }
 

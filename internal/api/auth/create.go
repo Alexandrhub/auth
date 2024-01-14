@@ -4,22 +4,19 @@ import (
 	"context"
 	"log"
 
-	"google.golang.org/grpc/codes"
-	"google.golang.org/grpc/status"
-
 	"github.com/alexandrhub/auth/internal/converter"
-	pb "github.com/alexandrhub/auth/pkg/user_v1"
+	desc "github.com/alexandrhub/auth/pkg/user_v1"
 )
 
-func (i *Implementation) Create(ctx context.Context, req *pb.CreateUserRequest) (*pb.CreateUserResponse, error) {
-	id, err := i.authService.Create(ctx, converter.ToUserFromDescCreate(req.Info))
+func (i *Implementation) Create(ctx context.Context, req *desc.CreateRequest) (*desc.CreateResponse, error) {
+	id, err := i.authService.Create(ctx, converter.ToUserFromDescCreate(req.GetInfo()))
 	if err != nil {
-		return nil, status.Error(codes.Internal, err.Error())
+		return nil, err
 	}
 
-	log.Println("User created: ", id)
+	log.Printf("inserted auth with id: %d", id)
 
-	return &pb.CreateUserResponse{
+	return &desc.CreateResponse{
 		Id: id,
 	}, nil
 }
