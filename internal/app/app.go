@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"log"
 	"net"
-	"sync"
 
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
@@ -37,19 +36,10 @@ func (a *App) Run() error {
 		closer.Wait()
 	}()
 
-	wg := sync.WaitGroup{}
-
-	wg.Add(1)
-	go func() {
-		defer wg.Done()
-
-		err := a.runGRPCServer()
-		if err != nil {
-			log.Fatalf("failed to run grpc server: %v", err)
-		}
-	}()
-
-	wg.Wait()
+	err := a.runGRPCServer()
+	if err != nil {
+		log.Fatalf("failed to run grpc server: %v", err)
+	}
 
 	return nil
 }
@@ -72,18 +62,24 @@ func (a *App) initDeps(ctx context.Context) error {
 }
 
 func (a *App) initConfig(_ context.Context) error {
-	a.serviceProvider.Config = config.MustConfig()
+	err := config.Load(".env")
+	if err != nil {
+		return err
+	}
 
 	return nil
 }
 
 func (a *App) initServiceProvider(_ context.Context) error {
+
 	a.serviceProvider = newServiceProvider()
 	return nil
 }
 
 func (a *App) initGRPCServer(ctx context.Context) error {
-	a.grpcServer = grpc.NewServer(grpc.Creds(insecure.NewCredentials()))
+	a.grpcServer = grpc.NewServer(
+		grpc.Creds(insecure.NewCredentials()),
+	)
 
 	reflection.Register(a.grpcServer)
 
@@ -93,9 +89,9 @@ func (a *App) initGRPCServer(ctx context.Context) error {
 }
 
 func (a *App) runGRPCServer() error {
-	log.Printf("Starting gRPC server... on port: [%v]", a.serviceProvider.Config.GRPC.Port)
+	log.Printf("Starting gRPC server... on port: [%v]", a.serviceProvider.GRPCConfig().Address())
 
-	lis, err := net.Listen("tcp", fmt.Sprintf(":%s", a.serviceProvider.Config.GRPC.Port))
+	lis, err := net.Listen("tcp", a.serviceProvider.GRPCConfig().Address())
 	if err != nil {
 		return err
 	}

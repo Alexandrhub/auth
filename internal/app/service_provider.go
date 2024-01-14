@@ -4,9 +4,10 @@ import (
 	"context"
 	"log"
 
-	"github.com/alexandrhub/auth/internal/auth"
+	"github.com/alexandrhub/auth/internal/api/auth"
 	"github.com/alexandrhub/auth/internal/closer"
 	"github.com/alexandrhub/auth/internal/config"
+	"github.com/alexandrhub/auth/internal/config/env"
 	"github.com/alexandrhub/auth/internal/db"
 	"github.com/alexandrhub/auth/internal/db/pg"
 	"github.com/alexandrhub/auth/internal/db/transaction"
@@ -17,21 +18,46 @@ import (
 )
 
 type serviceProvider struct {
-	Config config.Config
+	pgConfig   config.PGConfig
+	grpcConfig config.GRPCConfig
 
-	dbClient  db.Client
-	txManager db.TxManager
-	// TODO: add other services
+	dbClient       db.Client
+	txManager      db.TxManager
+	authRepository repository.AuthRepository
 
 	authService service.AuthService
-
-	authRepository repository.AuthRepository
 
 	authImpl *auth.Implementation
 }
 
 func newServiceProvider() *serviceProvider {
 	return &serviceProvider{}
+}
+
+func (s *serviceProvider) PGConfig() config.PGConfig {
+	if s.pgConfig == nil {
+		cfg, err := env.NewPGConfig()
+		if err != nil {
+			log.Fatalf("failed to init pg config: %v", err)
+		}
+
+		s.pgConfig = cfg
+	}
+
+	return s.pgConfig
+}
+
+func (s *serviceProvider) GRPCConfig() config.GRPCConfig {
+	if s.grpcConfig == nil {
+		cfg, err := env.NewGRPCConfig()
+		if err != nil {
+			log.Fatalf("failed to init grpc config: %v", err)
+		}
+
+		s.grpcConfig = cfg
+	}
+
+	return s.grpcConfig
 }
 
 func (s *serviceProvider) AuthRepository(ctx context.Context) repository.AuthRepository {
@@ -68,7 +94,7 @@ func (s *serviceProvider) TxManager(ctx context.Context) db.TxManager {
 
 func (s *serviceProvider) DBClient(ctx context.Context) db.Client {
 	if s.dbClient == nil {
-		cl, err := pg.NewDBClient(ctx, s.Config.DSN())
+		cl, err := pg.NewDBClient(ctx, s.PGConfig().DSN())
 		if err != nil {
 			log.Fatalf("failed to create db client: %v", err)
 		}
