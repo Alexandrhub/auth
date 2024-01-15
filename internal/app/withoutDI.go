@@ -8,8 +8,8 @@ import (
 	"google.golang.org/grpc/reflection"
 
 	"github.com/alexandrhub/auth/internal/api/auth"
-	"github.com/alexandrhub/auth/internal/db/pg"
-	"github.com/alexandrhub/auth/internal/db/transaction"
+	"github.com/alexandrhub/auth/internal/client/db/pg"
+	"github.com/alexandrhub/auth/internal/client/db/transaction"
 	authRepository "github.com/alexandrhub/auth/internal/repository/auth"
 	authService "github.com/alexandrhub/auth/internal/service/auth"
 	pb "github.com/alexandrhub/auth/pkg/user_v1"

@@ -1,7 +1,7 @@
 package auth
 
 import (
-	"github.com/alexandrhub/auth/internal/db"
+	"github.com/alexandrhub/auth/internal/client/db"
 	"github.com/alexandrhub/auth/internal/repository"
 	"github.com/alexandrhub/auth/internal/service"
 )

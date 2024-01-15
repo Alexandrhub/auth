@@ -7,7 +7,7 @@ import (
 
 	sq "github.com/Masterminds/squirrel"
 
-	"github.com/alexandrhub/auth/internal/db"
+	"github.com/alexandrhub/auth/internal/client/db"
 	"github.com/alexandrhub/auth/internal/model"
 	"github.com/alexandrhub/auth/internal/repository"
 	"github.com/alexandrhub/auth/internal/repository/auth/converter"
