@@ -20,12 +20,18 @@ install-deps:
 	GOBIN=$(LOCAL_BIN) go install github.com/grpc-ecosystem/grpc-gateway/v2/protoc-gen-grpc-gateway@v2.15.2
 	GOBIN=$(LOCAL_BIN) go install github.com/grpc-ecosystem/grpc-gateway/v2/protoc-gen-openapiv2@v2.15.2
 	GOBIN=$(LOCAL_BIN) go install github.com/gojuno/minimock/v3/cmd/minimock@v3.1.3
+	GOBIN=$(LOCAL_BIN) go install github.com/rakyll/statik@v0.1.7
 	#GOBIN=$(LOCAL_BIN) go install github.com/pressly/goose/v3/cmd/goose@v3.14.0
 
 get-deps:
 	go get -u google.golang.org/protobuf/cmd/protoc-gen-go
 	go get -u google.golang.org/grpc/cmd/protoc-gen-go-grpc
 	go get -u github.com/envoyproxy/protoc-gen-validate
+
+generate:
+	mkdir -p pkg/swagger
+	make generate-user-api
+	$(LOCAL_BIN)/statik -src=pkg/swagger/ -include='*.css,*.html,*.js,*.json,*.png'
 
 generate-user-api:
 	mkdir -p pkg/user_v1

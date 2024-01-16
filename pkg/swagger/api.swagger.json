@@ -4,7 +4,7 @@
     "title": "Auth",
     "version": "1.0.0",
     "contact": {
-      "name": "Alexandr"
+      "name": "Alex"
     }
   },
   "tags": [
@@ -24,15 +24,15 @@
     "application/json"
   ],
   "paths": {
-    "/users/v1": {
+    "/user/v1": {
       "get": {
-        "summary": "Get User",
-        "operationId": "UserV1_GetUser",
+        "summary": "Get user",
+        "operationId": "UserV1_Get",
         "responses": {
           "200": {
             "description": "A successful response.",
             "schema": {
-              "$ref": "#/definitions/user_v1GetUserResponse"
+              "$ref": "#/definitions/user_v1GetResponse"
             }
           },
           "default": {
@@ -56,8 +56,8 @@
         ]
       },
       "delete": {
-        "summary": "Delete User",
-        "operationId": "UserV1_DeleteUser",
+        "summary": "Delete user",
+        "operationId": "UserV1_Delete",
         "responses": {
           "200": {
             "description": "A successful response.",
@@ -86,40 +86,9 @@
           "UserV1"
         ]
       },
-      "post": {
-        "summary": "Create User",
-        "operationId": "UserV1_CreateUser",
-        "responses": {
-          "200": {
-            "description": "A successful response.",
-            "schema": {
-              "$ref": "#/definitions/user_v1CreateUserResponse"
-            }
-          },
-          "default": {
-            "description": "An unexpected error response.",
-            "schema": {
-              "$ref": "#/definitions/rpcStatus"
-            }
-          }
-        },
-        "parameters": [
-          {
-            "name": "body",
-            "in": "body",
-            "required": true,
-            "schema": {
-              "$ref": "#/definitions/user_v1CreateUserRequest"
-            }
-          }
-        ],
-        "tags": [
-          "UserV1"
-        ]
-      },
       "patch": {
-        "summary": "Update User",
-        "operationId": "UserV1_UpdateUser",
+        "summary": "Update user",
+        "operationId": "UserV1_Update",
         "responses": {
           "200": {
             "description": "A successful response.",
@@ -141,7 +110,40 @@
             "in": "body",
             "required": true,
             "schema": {
-              "$ref": "#/definitions/user_v1UpdateUserRequest"
+              "$ref": "#/definitions/user_v1UpdateRequest"
+            }
+          }
+        ],
+        "tags": [
+          "UserV1"
+        ]
+      }
+    },
+    "/user/v1/create": {
+      "post": {
+        "summary": "Create user",
+        "operationId": "UserV1_Create",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/user_v1CreateResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/user_v1CreateRequest"
             }
           }
         ],
@@ -180,7 +182,7 @@
         }
       }
     },
-    "user_v1CreateUserRequest": {
+    "user_v1CreateRequest": {
       "type": "object",
       "properties": {
         "info": {
@@ -188,7 +190,7 @@
         }
       }
     },
-    "user_v1CreateUserResponse": {
+    "user_v1CreateResponse": {
       "type": "object",
       "properties": {
         "id": {
@@ -197,7 +199,7 @@
         }
       }
     },
-    "user_v1GetUserResponse": {
+    "user_v1GetResponse": {
       "type": "object",
       "properties": {
         "info": {
@@ -214,7 +216,7 @@
       ],
       "default": "UNKNOWN"
     },
-    "user_v1UpdateUserRequest": {
+    "user_v1UpdateRequest": {
       "type": "object",
       "properties": {
         "info": {
@@ -226,15 +228,18 @@
       "type": "object",
       "properties": {
         "userCreate": {
-          "$ref": "#/definitions/user_v1UserCreate"
+          "$ref": "#/definitions/user_v1UserCreate",
+          "title": "User create struct"
         },
         "createdAt": {
           "type": "string",
-          "format": "date-time"
+          "format": "date-time",
+          "title": "Created"
         },
         "updatedAt": {
           "type": "string",
-          "format": "date-time"
+          "format": "date-time",
+          "title": "Updated"
         }
       }
     },
@@ -242,10 +247,12 @@
       "type": "object",
       "properties": {
         "userUpdate": {
-          "$ref": "#/definitions/user_v1UserUpdate"
+          "$ref": "#/definitions/user_v1UserUpdate",
+          "title": "User update struct"
         },
         "password": {
-          "type": "string"
+          "type": "string",
+          "title": "Password"
         }
       }
     },
@@ -254,16 +261,20 @@
       "properties": {
         "id": {
           "type": "string",
-          "format": "int64"
+          "format": "int64",
+          "title": "ID"
         },
         "name": {
-          "type": "string"
+          "type": "string",
+          "title": "Name"
         },
         "email": {
-          "type": "string"
+          "type": "string",
+          "title": "Email"
         },
         "role": {
-          "$ref": "#/definitions/user_v1Role"
+          "$ref": "#/definitions/user_v1Role",
+          "title": "Role"
         }
       }
     }

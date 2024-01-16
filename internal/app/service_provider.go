@@ -18,9 +18,10 @@ import (
 )
 
 type serviceProvider struct {
-	pgConfig   config.PGConfig
-	grpcConfig config.GRPCConfig
-	httpConfig config.HTTPConfig
+	pgConfig      config.PGConfig
+	grpcConfig    config.GRPCConfig
+	httpConfig    config.HTTPConfig
+	swaggerConfig config.SwaggerConfig
 
 	dbClient       db.Client
 	txManager      db.TxManager
@@ -72,6 +73,19 @@ func (s *serviceProvider) HTTPConfig() config.HTTPConfig {
 	}
 
 	return s.httpConfig
+}
+
+func (s *serviceProvider) SwaggerConfig() config.SwaggerConfig {
+	if s.swaggerConfig == nil {
+		cfg, err := env.NewSwaggerConfig()
+		if err != nil {
+			log.Fatalf("failed to init swagger config: %v", err)
+		}
+
+		s.swaggerConfig = cfg
+	}
+
+	return s.swaggerConfig
 }
 
 func (s *serviceProvider) AuthRepository(ctx context.Context) repository.AuthRepository {
