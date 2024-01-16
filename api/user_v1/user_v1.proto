@@ -78,7 +78,7 @@ message UserUpdate {
   // Name
   string name = 2 [(validate.rules).string = {min_len: 1, max_len: 50}];
   // Email
-  string email = 3;
+  string email = 3 [(validate.rules).string = {email: true}];
   // Role
   Role role = 5;
 }
