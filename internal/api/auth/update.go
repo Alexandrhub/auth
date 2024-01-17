@@ -4,7 +4,6 @@ import (
 	"context"
 
 	"github.com/golang/protobuf/ptypes/empty"
-	"google.golang.org/protobuf/types/known/emptypb"
 
 	"github.com/alexandrhub/auth/internal/converter"
 	desc "github.com/alexandrhub/auth/pkg/user_v1"
@@ -16,5 +15,5 @@ func (i *Implementation) Update(ctx context.Context, req *desc.UpdateRequest) (*
 		return nil, err
 	}
 
-	return &emptypb.Empty{}, nil
+	return &empty.Empty{}, nil
 }
