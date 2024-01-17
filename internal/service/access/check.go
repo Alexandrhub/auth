@@ -2,6 +2,7 @@ package access
 
 import (
 	"context"
+	"log"
 	"strings"
 
 	"github.com/pkg/errors"
@@ -13,10 +14,10 @@ import (
 // move to .env
 const (
 	grpcPort   = 50051
-	authPrefix = "Bearer"
+	authPrefix = "Bearer "
 
-	refreshTokenSecretKey = "refresh_token_secret_key"
-	accessTokenSecretKey  = "access_token_secret_key"
+	refreshTokenSecretKey = "W4/X+LLjehdxptt4YgGFCvMpq5ewptpZZYRHY6A72g0="
+	accessTokenSecretKey  = "VqvguGiffXILza1f44TWXowDT4zwf03dtXmqWW4SYyE="
 )
 
 var accessibleRoles map[string]string
@@ -40,6 +41,8 @@ func (s *serverAccess) Check(ctx context.Context, endpointAddress string) error 
 
 	claims, err := utils.VerifyToken(accessToken, []byte(accessTokenSecretKey))
 	if err != nil {
+		log.Println(accessToken)
+		log.Println("failed to verify access token:", err.Error())
 		return errors.New("invalid access token")
 	}
 

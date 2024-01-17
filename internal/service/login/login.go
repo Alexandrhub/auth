@@ -13,7 +13,7 @@ import (
 
 const (
 	refreshTokenExpiration = 60 * time.Minute
-	accessTokenExpiration  = 1 * time.Minute
+	accessTokenExpiration  = 15 * time.Minute
 )
 
 func (s *serverAuth) Login(ctx context.Context, info *model.UserClaims) (string, error) {
