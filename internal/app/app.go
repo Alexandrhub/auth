@@ -19,6 +19,8 @@ import (
 	"github.com/alexandrhub/auth/internal/closer"
 	"github.com/alexandrhub/auth/internal/config"
 	"github.com/alexandrhub/auth/internal/interceptor"
+	pbAccess "github.com/alexandrhub/auth/pkg/access_v1"
+	pbAuth "github.com/alexandrhub/auth/pkg/auth_v1"
 	pb "github.com/alexandrhub/auth/pkg/user_v1"
 	_ "github.com/alexandrhub/auth/statik"
 )
@@ -122,6 +124,8 @@ func (a *App) initGRPCServer(ctx context.Context) error {
 	reflection.Register(a.grpcServer)
 
 	pb.RegisterUserV1Server(a.grpcServer, a.serviceProvider.AuthImpl(ctx))
+	pbAuth.RegisterAuthV1Server(a.grpcServer, a.serviceProvider.LoginImpl(ctx))
+	pbAccess.RegisterAccessV1Server(a.grpcServer, a.serviceProvider.AccessImpl(ctx))
 
 	return nil
 }
