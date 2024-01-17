@@ -4,7 +4,9 @@ import (
 	"context"
 	"log"
 
+	"github.com/alexandrhub/auth/internal/api/access"
 	"github.com/alexandrhub/auth/internal/api/auth"
+	"github.com/alexandrhub/auth/internal/api/login"
 	"github.com/alexandrhub/auth/internal/client/db"
 	"github.com/alexandrhub/auth/internal/client/db/pg"
 	"github.com/alexandrhub/auth/internal/client/db/transaction"
@@ -12,9 +14,13 @@ import (
 	"github.com/alexandrhub/auth/internal/config"
 	"github.com/alexandrhub/auth/internal/config/env"
 	"github.com/alexandrhub/auth/internal/repository"
+	accessRepository "github.com/alexandrhub/auth/internal/repository/access"
 	authRepository "github.com/alexandrhub/auth/internal/repository/auth"
+	loginRepository "github.com/alexandrhub/auth/internal/repository/login"
 	"github.com/alexandrhub/auth/internal/service"
+	accessService "github.com/alexandrhub/auth/internal/service/access"
 	authService "github.com/alexandrhub/auth/internal/service/auth"
+	loginService "github.com/alexandrhub/auth/internal/service/login"
 )
 
 type serviceProvider struct {
@@ -23,13 +29,19 @@ type serviceProvider struct {
 	httpConfig    config.HTTPConfig
 	swaggerConfig config.SwaggerConfig
 
-	dbClient       db.Client
-	txManager      db.TxManager
-	authRepository repository.AuthRepository
+	dbClient         db.Client
+	txManager        db.TxManager
+	authRepository   repository.AuthRepository
+	loginRepository  repository.LoginRepository
+	accessRepository repository.AccessRepository
 
-	authService service.AuthService
+	authService   service.AuthService
+	loginService  service.LoginService
+	accessService service.AccessService
 
-	authImpl *auth.Implementation
+	authImpl   *auth.Implementation
+	loginImpl  *login.Implementation
+	accessImpl *access.Implementation
 }
 
 func newServiceProvider() *serviceProvider {
@@ -110,6 +122,60 @@ func (s *serviceProvider) AuthImpl(ctx context.Context) *auth.Implementation {
 	}
 
 	return s.authImpl
+}
+
+func (s *serviceProvider) LoginRepository(ctx context.Context) repository.LoginRepository {
+	if s.loginRepository == nil {
+		s.loginRepository = loginRepository.NewRepository(s.DBClient(ctx))
+	}
+
+	return s.loginRepository
+}
+
+func (s *serviceProvider) LoginService(ctx context.Context) service.LoginService {
+	if s.loginService == nil {
+		s.loginService = loginService.NewService(
+			s.LoginRepository(ctx),
+			s.TxManager(ctx),
+		)
+	}
+
+	return s.loginService
+}
+
+func (s *serviceProvider) LoginImpl(ctx context.Context) *login.Implementation {
+	if s.loginImpl == nil {
+		s.loginImpl = login.NewImplementation(s.LoginService(ctx))
+	}
+
+	return s.loginImpl
+}
+
+func (s *serviceProvider) AccessRepository(ctx context.Context) repository.AccessRepository {
+	if s.accessRepository == nil {
+		s.accessRepository = accessRepository.NewRepository(s.DBClient(ctx))
+	}
+
+	return s.accessRepository
+}
+
+func (s *serviceProvider) AccessService(ctx context.Context) service.AccessService {
+	if s.accessService == nil {
+		s.accessService = accessService.NewService(
+			s.AccessRepository(ctx),
+			s.TxManager(ctx),
+		)
+	}
+
+	return s.accessService
+}
+
+func (s *serviceProvider) AccessImpl(ctx context.Context) *access.Implementation {
+	if s.accessImpl == nil {
+		s.accessImpl = access.NewImplementation(s.AccessService(ctx))
+	}
+
+	return s.accessImpl
 }
 
 func (s *serviceProvider) TxManager(ctx context.Context) db.TxManager {
