@@ -7,11 +7,16 @@ import (
 	"log"
 	"net"
 	"net/http"
+	"os"
 	"sync"
 
+	grpcMW "github.com/grpc-ecosystem/go-grpc-middleware"
 	"github.com/grpc-ecosystem/grpc-gateway/v2/runtime"
+	"github.com/natefinch/lumberjack"
 	"github.com/rakyll/statik/fs"
 	"github.com/rs/cors"
+	"go.uber.org/zap"
+	"go.uber.org/zap/zapcore"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
 	"google.golang.org/grpc/reflection"
@@ -19,6 +24,7 @@ import (
 	"github.com/alexandrhub/auth/internal/closer"
 	"github.com/alexandrhub/auth/internal/config"
 	"github.com/alexandrhub/auth/internal/interceptor"
+	"github.com/alexandrhub/auth/internal/logger"
 	pbAccess "github.com/alexandrhub/auth/pkg/access_v1"
 	pbAuth "github.com/alexandrhub/auth/pkg/auth_v1"
 	pb "github.com/alexandrhub/auth/pkg/user_v1"
@@ -116,9 +122,15 @@ func (a *App) initServiceProvider(_ context.Context) error {
 }
 
 func (a *App) initGRPCServer(ctx context.Context) error {
+	logger.Init(getCore(getAtomicLevel()))
 	a.grpcServer = grpc.NewServer(
 		grpc.Creds(insecure.NewCredentials()),
-		grpc.UnaryInterceptor(interceptor.ValidateInterceptor),
+		grpc.UnaryInterceptor(
+			grpcMW.ChainUnaryServer(
+				interceptor.LogInterceptor,
+				interceptor.ValidateInterceptor,
+			),
+		),
 	)
 
 	reflection.Register(a.grpcServer)
@@ -251,4 +263,41 @@ func serveSwaggerFile(path string) http.HandlerFunc {
 
 		log.Printf("swagger file served: [%s]", path)
 	}
+}
+
+func getCore(level zap.AtomicLevel) zapcore.Core {
+	stdout := zapcore.AddSync(os.Stdout)
+
+	file := zapcore.AddSync(
+		&lumberjack.Logger{
+			Filename:   "logs/app.log",
+			MaxSize:    10, // megabytes
+			MaxBackups: 3,
+			MaxAge:     7, // days
+		},
+	)
+
+	productionCfg := zap.NewProductionEncoderConfig()
+	productionCfg.TimeKey = "timestamp"
+	productionCfg.EncodeTime = zapcore.ISO8601TimeEncoder
+
+	developmentCfg := zap.NewDevelopmentEncoderConfig()
+	developmentCfg.EncodeLevel = zapcore.CapitalColorLevelEncoder
+
+	consoleEncoder := zapcore.NewConsoleEncoder(developmentCfg)
+	fileEncoder := zapcore.NewJSONEncoder(productionCfg)
+
+	return zapcore.NewTee(
+		zapcore.NewCore(consoleEncoder, stdout, level),
+		zapcore.NewCore(fileEncoder, file, level),
+	)
+}
+
+func getAtomicLevel() zap.AtomicLevel {
+	var level zapcore.Level
+	if err := level.Set(os.Getenv("LOG_LEVEL")); err != nil {
+		log.Fatalf("failed to set log level: %v", err)
+	}
+
+	return zap.NewAtomicLevelAt(level)
 }
