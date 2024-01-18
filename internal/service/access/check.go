@@ -53,7 +53,7 @@ func (s *serverAccess) Check(ctx context.Context, endpointAddress string) error 
 
 	role, ok := accessibleMap[endpointAddress]
 	if !ok {
-		return errors.New("endpoint is not accessible")
+		return nil
 	}
 
 	if role == claims.Role {

@@ -10,6 +10,7 @@ import (
 	"google.golang.org/grpc/credentials/insecure"
 	"google.golang.org/grpc/metadata"
 
+	"github.com/alexandrhub/auth/internal/model"
 	"github.com/alexandrhub/auth/pkg/access_v1"
 )
 
@@ -44,7 +45,7 @@ func main() {
 
 	_, err = cl.Check(
 		ctx, &access_v1.CheckRequest{
-			EndpointAddress: "/auth_v1.AuthV1/Get",
+			EndpointAddress: model.ExamplePath,
 		},
 	)
 	if err != nil {
