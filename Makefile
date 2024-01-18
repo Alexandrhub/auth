@@ -110,3 +110,14 @@ test-coverage:
 	go tool cover -html=coverage.out;
 	go tool cover -func=./coverage.out | grep "total";
 	grep -sqFx "/coverage.out" .gitignore || echo "/coverage.out" >> .gitignore
+
+grpc-load-test:
+	ghz \
+	--proto api/user_v1/user_v1.proto \
+	--import-paths=./vendor.protogen/ \
+	--call user_v1.UserV1.Get \
+	--data '{"id": 1}' \
+	--rps 100 \
+	--total 3000 \
+	--insecure \
+	localhost:50051
