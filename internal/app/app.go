@@ -166,6 +166,7 @@ func (a *App) initGRPCServer(ctx context.Context) error {
 			grpcMW.ChainUnaryServer(
 				interceptor.NewCircuitBreakerInterceptor(circuitBreaker).Unary,
 				interceptor.NewRateLimiterInterceptor(rateLimiter).Unary,
+				interceptor.ErrorCodesInterceptor,
 				interceptor.MetricsInterceptor,
 				interceptor.LogInterceptor,
 				interceptor.ValidateInterceptor,
