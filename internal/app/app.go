@@ -9,6 +9,7 @@ import (
 	"net/http"
 	"os"
 	"sync"
+	"time"
 
 	grpcMW "github.com/grpc-ecosystem/go-grpc-middleware"
 	"github.com/grpc-ecosystem/grpc-gateway/v2/runtime"
@@ -27,6 +28,7 @@ import (
 	"github.com/alexandrhub/auth/internal/interceptor"
 	"github.com/alexandrhub/auth/internal/logger"
 	"github.com/alexandrhub/auth/internal/metric"
+	"github.com/alexandrhub/auth/internal/rate_limiter"
 	pbAccess "github.com/alexandrhub/auth/pkg/access_v1"
 	pbAuth "github.com/alexandrhub/auth/pkg/auth_v1"
 	pb "github.com/alexandrhub/auth/pkg/user_v1"
@@ -141,10 +143,13 @@ func (a *App) initGRPCServer(ctx context.Context) error {
 		return err
 	}
 
+	rateLimiter := rate_limiter.NewTokenBucketLimiter(ctx, 10, time.Second)
+
 	a.grpcServer = grpc.NewServer(
 		grpc.Creds(insecure.NewCredentials()),
 		grpc.UnaryInterceptor(
 			grpcMW.ChainUnaryServer(
+				interceptor.NewRateLimiterInterceptor(rateLimiter).Unary,
 				interceptor.MetricsInterceptor,
 				interceptor.LogInterceptor,
 				interceptor.ValidateInterceptor,
